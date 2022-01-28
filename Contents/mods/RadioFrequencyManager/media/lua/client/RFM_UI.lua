@@ -45,7 +45,7 @@ function RadioFrequencyManagerUI:new()
     o = ISCollapsableWindow:new(startingX, startingY, panelWidth, panelHeight);
     setmetatable(o, self);
     self.__index = self;
-    o.title = "Radio Frequency Manager";
+    o.title = getText("UI_KRFM_RfmTitle");
     o.x = startingX;
     o.y = startingY;
     o.width = panelWidth;
@@ -64,7 +64,7 @@ function RadioFrequencyManagerUI:new()
     o:initialise();
     o:addToUIManager();
 
-    o:setInfo("test text");
+    o:setInfo(getText("UI_KRFM_InfoText"));
 
     return o;
 end
@@ -84,13 +84,13 @@ end
 
 function RadioFrequencyManagerUI:create()
     -- "Toolbar" buttons - Import/Export
-    self.copyButton = ISButton:new(15, 25, 25, 25, "Copy from radio", self, self.onCopy);
+    self.copyButton = ISButton:new(15, 25, 25, 25, getText("UI_KRFM_CopyFromRadio"), self, self.onCopy);
     self.copyButton:initialise();
     self.copyButton:instantiate();
     self.copyButton.borderColor = {r = 0.7, g = 0.7, b = 0.7, a = 0.5};
     self:addChild(self.copyButton);
 
-    self.customButton = ISButton:new(self.copyButton:getRight() + 10, 25, 25, 25, "Custom", self, self.onCustomAdd);
+    self.customButton = ISButton:new(self.copyButton:getRight() + 10, 25, 25, 25, getText("UI_KRFM_Custom"), self, self.onCustomAdd);
     self.customButton:initialise();
     self.customButton:instantiate();
     self.customButton.borderColor = {r = 0.7, g = 0.7, b = 0.7, a = 0.5};

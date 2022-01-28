@@ -1,7 +1,7 @@
 require "ISUI/ISButton"
 require "ISUI/ISCharacterScreen"
 
-local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
+local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small);
 
 local ISCharacterScreen_create = ISCharacterScreen.create;
 function ISCharacterScreen:create()
@@ -10,7 +10,7 @@ function ISCharacterScreen:create()
     local x = self.literatureButton:getRight() - self.literatureButton.width;
     local y = self.literatureButton:getBottom() + 5;
 
-	self.rfmButton = ISButton:new(x, y, 100, FONT_HGT_SMALL, "Open RFM", self, ISCharacterScreen.onOpenRfm);
+	self.rfmButton = ISButton:new(x, y, 100, FONT_HGT_SMALL, getText("UI_KRFM_OpenRfm"), self, ISCharacterScreen.onOpenRfm);
 	self.rfmButton:initialise();
 	self.rfmButton:instantiate();
 	self.rfmButton.background = false;

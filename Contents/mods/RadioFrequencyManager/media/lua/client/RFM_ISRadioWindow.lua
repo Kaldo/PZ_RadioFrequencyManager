@@ -6,7 +6,7 @@ require "ISUI/ISButton"
 local ISRadioWindow_createChildren =  ISRadioWindow.createChildren;
 function ISRadioWindow:createChildren()
     ISRadioWindow_createChildren(self);
-    self:addModule(RWMFrequencyManager:new (0, 0, self.width, 0 ), "Frequency Manager", true); -- getText("IGUI_RadioChannel")
+    self:addModule(RWMFrequencyManager:new (0, 0, self.width, 0 ), getText("UI_KRFM_FreqManager"), true);
 end
 
 -- define module
@@ -17,7 +17,7 @@ function RWMFrequencyManager:initialise()
 end
 
 function RWMFrequencyManager:createChildren()
-    self.openRfmButton = ISButton:new(10, 5, self.width-20, 18, "Open RFM", self, RWMFrequencyManager.onOpenRfm);
+    self.openRfmButton = ISButton:new(10, 5, self.width-20, 18, getText("UI_KRFM_OpenRfm"), self, RWMFrequencyManager.onOpenRfm);
     self.openRfmButton:initialise();
     self.openRfmButton.backgroundColor = {r=0, g=0, b=0, a=0.0};
     self.openRfmButton.backgroundColorMouseOver = {r=1.0, g=1.0, b=1.0, a=0.1};
@@ -57,7 +57,7 @@ function RWMFrequencyManager:onJoypadDown(button)
 end
 
 function RWMFrequencyManager:getAPrompt()
-    return "Open RFM";
+    return getText("UI_KRFM_OpenRfm");
 end
 function RWMFrequencyManager:getBPrompt()
     return nil;
