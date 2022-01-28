@@ -1,4 +1,5 @@
 require "ISUI/ISPanel" -- Or require "ISUI/ISPanelJoypad"
+require "ISUI/ISButton"
 
 -- local RadioFrequencyManagerUI = RadioFrequencyManagerUI;
 

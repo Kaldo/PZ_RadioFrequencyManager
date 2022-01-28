@@ -50,6 +50,8 @@ function RadioFrequencyManagerUI:new()
     o.y = startingY;
     o.width = panelWidth;
     o.height = panelHeight;
+    o.minimumWidth = 300;
+    o.minimumHeight = 100;
     o.resizable = true;
     o.drawFrame = true;
     o.borderColor = {r=0.4, g=0.4, b=0.4, a=1};
