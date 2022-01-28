@@ -18,10 +18,22 @@ local mysplit = function(inputstr, sep)
     return t
 end
 
+KaldoRFM_UI = {};
+KaldoRFM_UI.instance = nil;
+KaldoRFM_UI.toggle = function()
+    if KaldoRFM_UI.instance == nil then
+        print("RFM - window not initialized - create new window");
+        KaldoRFM_UI.instance = RadioFrequencyManagerUI:new();
+    else
+        print("RFM - window exists - handle toggling");
+        KaldoRFM_UI.instance:actualClose();
+        KaldoRFM_UI.instance = nil;
+    end
+end
 
 RadioFrequencyManagerUI = ISCollapsableWindow:derive("RadioFrequencyManagerUI")
 
-function RadioFrequencyManagerUI:new(parent)
+function RadioFrequencyManagerUI:new()
     local mD = self:loadModData();
 
     local panelWidth = mD.panelSettings.width;
@@ -44,7 +56,6 @@ function RadioFrequencyManagerUI:new(parent)
     o.backgroundColor.a = 0.9;
     o.moveWithMouse = true;
 
-    o.prnt = parent;
     o.storedChannels = mD.storedChannels;
     o.renderedChannels = {};
 
@@ -141,6 +152,10 @@ function RadioFrequencyManagerUI.createChannelRow(parent, channel, index)
     local contentText = (channel.Freq / 1000) .. " - " .. channel.Name;
     local content = ISButton:new(status:getRight(), status:getBottom() - freqHeight,
         freqWidth, freqHeight, contentText, parent, RadioFrequencyManagerUI.onTuneIn);
+    local origDrawText = content.drawText;
+    content.drawText = function(self, title, x, y, r, g, b, a, font)
+        origDrawText(self, title, 10, y, r, g, b, a, font);
+    end
     content:initialise();
     content:instantiate();
     content.borderColor = {r = 0.7, g = 0.7, b = 0.7, a = 0.5};
@@ -168,24 +183,15 @@ function RadioFrequencyManagerUI.createChannelRow(parent, channel, index)
 end
 
 function RadioFrequencyManagerUI:close()
-	ISCollapsableWindow.close(self)
+    -- Redirect titlebar close, that way we can handle the instance ourselves
+    KaldoRFM_UI.toggle();
+end
 
+function RadioFrequencyManagerUI:actualClose()
+	ISCollapsableWindow.close(self);
     self:saveModData();
-
-    if self.prnt then
-        self.prnt.instance = nil;
-    end
     self:setVisible(false);
     self:removeFromUIManager();
-    -- if self:getIsVisible() then
-    --     -- self:setVisible(false);
-    --     self.parent.instance = nil; -- If you use parent
-    --     self:setVisible(false);
-    --     self:removeFromUIManager();
-    -- else
-    --     -- self:renderCategoryButtons();
-    --     self:setVisible(true);
-    -- end
 end
 
 function RadioFrequencyManagerUI:onStatusClicked(button, x, y)
