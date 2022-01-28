@@ -2,7 +2,7 @@ require "RadioCom/ISRadioWindow"
 require "RadioCom/RadioWindowModules/RWMPanel"
 require "ISUI/ISButton"
 
--- add a new RadioWindowModule RWMFrequencyManager
+-- add a new RadioWindowModule, RWMFrequencyManager
 local ISRadioWindow_createChildren =  ISRadioWindow.createChildren;
 function ISRadioWindow:createChildren()
     ISRadioWindow_createChildren(self);
