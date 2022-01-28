@@ -345,23 +345,18 @@ function RadioFrequencyManagerUI:getRadioChannelElement()
     local radioInstancesIso = ISRadioWindow.instancesIso;
 
     local radioInstance = nil;
-    if radioInstances and radioInstances[playerNum] then
+    if radioInstances and radioInstances[playerNum] and radioInstances[playerNum].modules[8].enabled == true then
         radioInstance = radioInstances[playerNum];
     end
-    if radioInstancesIso and radioInstancesIso[playerNum] then
+    if radioInstancesIso and radioInstancesIso[playerNum] and radioInstancesIso[playerNum].modules[8].enabled == true then
         radioInstance = radioInstancesIso[playerNum];
     end
     if radioInstance == nil then
-        print("radioInstances: Radio window not open or doesnt exist");
+        print("radioInstances: Radio window not open or doesnt exist, or all are inactive");
         return nil;
     end
 
     local channelInstance = radioInstance.modules[8];
-    if channelInstance.enabled == false then
-        print "radio disabled?";
-        return nil;
-    end
-
     local channelElement = channelInstance.element;
     return channelElement;
 end
