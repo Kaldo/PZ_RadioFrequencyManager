@@ -6,7 +6,7 @@ require "ISUI/ISButton"
 local ISRadioWindow_createChildren =  ISRadioWindow.createChildren;
 function ISRadioWindow:createChildren()
     ISRadioWindow_createChildren(self);
-    self:addModule(RWMFrequencyManager:new (0, 0, self.width, 0 ), getText("UI_KRFM_FreqManager"), true);
+    self:addModule(RWMFrequencyManager:new (0, 0, self.width, 0 ), getText("UI_KRFM_RadioTabTitle"), true);
 end
 
 -- define module
