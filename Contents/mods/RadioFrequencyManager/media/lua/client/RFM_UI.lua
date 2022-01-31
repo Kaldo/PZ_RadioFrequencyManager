@@ -6,6 +6,7 @@ require "ISUI/ISMouseDrag"
 require "ISUI/ISRadioButtons"
 require "ISUI/ISTextEntryBox"
 require "ISUI/ISToolTip"
+require "RFM_ScrollableChannels"
 
 RadioFrequencyManagerUI = ISCollapsableWindow:derive("RadioFrequencyManagerUI")
 
@@ -74,7 +75,22 @@ function RadioFrequencyManagerUI:create()
     self:addChild(self.customButton);
 
     -- Render rows
-    self:renderStoredChannels();
+    -- self:renderStoredChannels();
+    local offsetY = self.customButton:getBottom() + 10;
+    self.list = RFM_ScrollableChannels:new(0, offsetY, self.width, self.height-offsetY-10, self);
+    self.list.internal = "list"
+    self.list.UI_SIZE = 10-- self.UI_SIZE
+    self.list.parent = self
+    self.list:initialise();
+    self.list:instantiate();
+    self.list.itemheight = 10--self.iconSize;
+    self.list.joypadParent = self;
+    -- self.list.font = self.UIFont_use;
+    -- self.list.playerNum = self.playerNum
+    -- self.list.onRightMouseDown = self.onRightMouseDown;
+    -- self.list:setOnMouseDoubleClick(self, self.onDClickItem);
+    self.list.drawBorder = true;
+    self:addChild(self.list);
 end
 
 function RadioFrequencyManagerUI:renderStoredChannels()
@@ -407,11 +423,15 @@ function RadioFrequencyManagerUI:saveModData()
 end
 
 -- way too inefficient to do on every run. find a way to only do it on last update
--- function RadioFrequencyManagerUI:onResize()
---     self.width = self:getWidth();
---     self.height = self:getHeight();
---     self:renderStoredChannels();
--- end
+function RadioFrequencyManagerUI:onResize()
+    -- self.width = self:getWidth();
+    -- self.height = self:getHeight();
+    -- self:renderStoredChannels();
+
+    local offsetY = self.customButton:getBottom() + 10;
+    self.list:setWidth(self.width);
+    self.list:setHeight(self.height-offsetY-10);
+end
 
 
 --************************************************************************--
