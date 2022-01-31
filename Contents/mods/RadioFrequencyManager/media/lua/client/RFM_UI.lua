@@ -5,6 +5,7 @@ require "ISUI/ISResizeWidget"
 require "ISUI/ISMouseDrag"
 require "ISUI/ISRadioButtons"
 require "ISUI/ISTextEntryBox"
+require "ISUI/ISToolTip"
 
 local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small);
 local mysplit = function(inputstr, sep)
@@ -33,6 +34,10 @@ end
 
 RadioFrequencyManagerUI = ISCollapsableWindow:derive("RadioFrequencyManagerUI")
 
+--************************************************************************--
+--** RadioFrequencyManagerUI:new
+--**
+--************************************************************************--
 function RadioFrequencyManagerUI:new()
     local mD = self:loadModData();
 
@@ -85,6 +90,7 @@ end
 function RadioFrequencyManagerUI:create()
     -- "Toolbar" buttons - Import/Export
     self.copyButton = ISButton:new(15, 25, 25, 25, getText("UI_KRFM_CopyFromRadio"), self, self.onCopy);
+    self.copyButton.tooltip = getText("UI_KRFM_CopyFromRadio_Tooltip");
     self.copyButton:initialise();
     self.copyButton:instantiate();
     self.copyButton.borderColor = {r = 0.7, g = 0.7, b = 0.7, a = 0.5};
@@ -116,6 +122,8 @@ function RadioFrequencyManagerUI:renderStoredChannels()
     self.renderedChannels = {};
 
     table.sort(self.storedChannels, function(a, b) return a.Freq < b.Freq end);
+
+    -- TODO: render channels in a scrollable element
 
     -- insert stored channels
     local idx = 0;
@@ -271,6 +279,12 @@ function RadioFrequencyManagerUI:onCopy()
         return;
     end
     
+    -- On shift-click copy all available channels
+    if isKeyDown(Keyboard.KEY_LSHIFT) then
+        self:onCopyAll(channelElement);
+        return;
+    end
+
     -- Get selected preset to copy
     local rwmChannelSubpanel = channelElement.subpanel; -- buttons are here: .editPresetButton, tuneInButton, deletePresetButton, openRfmButton, ...
     local p = rwmChannelSubpanel.presets:get(rwmChannelSubpanel.comboBox.selected - 1);
@@ -283,6 +297,30 @@ function RadioFrequencyManagerUI:onCopy()
     local newID = self:getNewChannelId();
     table.insert(self.storedChannels, { MyID = newID, Freq = p:getFrequency(), Name = p:getName(), State = 1 });
     self:renderStoredChannels();
+end
+
+function RadioFrequencyManagerUI:onCopyAll(channelElement)
+    local rwmChannelSubpanel = channelElement.subpanel;
+    local options = rwmChannelSubpanel.presets;
+    for i = 0, options:size()-1 do
+        local option = options:get(i);
+        local freq = option:getFrequency();
+        -- check if frequency already exists
+        if self:isFrequencyAlreadyAdded(freq) == false then
+            local newID = self:getNewChannelId();
+            table.insert(self.storedChannels, { MyID = newID, Freq = freq, Name = option:getName(), State = 1 });
+        end
+    end
+    self:renderStoredChannels();
+end
+
+function RadioFrequencyManagerUI:isFrequencyAlreadyAdded(freq)
+    for _, channel in ipairs(self.storedChannels) do
+        if channel.Freq == freq then
+            return true;
+        end
+    end
+    return false;
 end
 
 function RadioFrequencyManagerUI:onCustomAdd(button)
@@ -400,9 +438,8 @@ end
 
 
 --************************************************************************--
---** Predefined channels
+--** Sandbox options - predefined channels
 --************************************************************************--
-
 Events.OnCreatePlayer.Add(function()
     if SandboxVars.RadioFrequencyManager.EnablePredefinedChannels == true then
         -- create instance
@@ -412,7 +449,7 @@ Events.OnCreatePlayer.Add(function()
         local predefinedColor = SandboxVars.RadioFrequencyManager.DefaultColor;
 
         print("RFM_UI: OnCreatePlayer - initializing with sandbox option: " .. predefinedString);
-        
+
         -- rudimentary validations in case the trust system fails
         -- example: 89.4;Hitz FM|93.2;LBMW - Kentucky Radio|98;NNR Radio|101.2;KnoxTalk Radio
         if predefinedString == nil then return end
