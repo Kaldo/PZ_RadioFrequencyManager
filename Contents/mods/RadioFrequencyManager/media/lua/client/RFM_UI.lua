@@ -44,7 +44,7 @@ end
 --************************************************************************--
 function RadioFrequencyManagerUI:initialise()
     ISCollapsableWindow.initialise(self);
-    -- self:create();
+    self:create();
 end
 
 function RadioFrequencyManagerUI:prerender()
@@ -58,7 +58,7 @@ end
 --************************************************************************--
 --** RadioFrequencyManagerUI - creating
 --************************************************************************--
-function RadioFrequencyManagerUI:createChildren()
+function RadioFrequencyManagerUI:create()
     -- "Toolbar" buttons - Import/Export
     self.copyButton = ISButton:new(15, 25, 25, 25, getText("UI_KRFM_CopyFromRadio"), self, self.onCopy);
     self.copyButton.tooltip = getText("UI_KRFM_CopyFromRadio_Tooltip");
@@ -381,6 +381,7 @@ function RadioFrequencyManagerUI:loadModData()
         local reset = false;
         if modData.Kaldo_RFM == nil or reset == true then
             modData.Kaldo_RFM = {
+                isFirstRun = true,
                 storedChannels = {},
                 panelSettings = { x = 70, y = 400, width = 400, height = 300 };
             }
@@ -394,6 +395,7 @@ end
 function RadioFrequencyManagerUI:saveModData()
     local player = getPlayer();
     local modData =  player:getModData()
+    modData.Kaldo_RFM.isFirstRun = self.k_isFirstRun;
     modData.Kaldo_RFM.storedChannels = self.storedChannels;
     modData.Kaldo_RFM.panelSettings = {
         x = self.x;
@@ -419,6 +421,13 @@ Events.OnCreatePlayer.Add(function()
     if SandboxVars.RadioFrequencyManager.EnablePredefinedChannels == true then
         -- create instance
         KaldoRFM_UI.toggle();
+
+        if KaldoRFM_UI.instance.k_isFirstRun == false then
+            KaldoRFM_UI.toggle();
+            return;
+        else
+            KaldoRFM_UI.instance.k_isFirstRun = false;
+        end
 
         local predefinedString = SandboxVars.RadioFrequencyManager.PredefinedChannels;
         local predefinedColor = SandboxVars.RadioFrequencyManager.DefaultColor;
@@ -483,6 +492,7 @@ function RadioFrequencyManagerUI:new()
 
     o.storedChannels = mD.storedChannels;
     o.renderedChannels = {};
+    o.k_isFirstRun = mD.isFirstRun;
 
     o:initialise();
     o:addToUIManager();
