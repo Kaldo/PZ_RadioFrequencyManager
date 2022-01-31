@@ -7,7 +7,11 @@ require "ISUI/ISRadioButtons"
 require "ISUI/ISTextEntryBox"
 require "ISUI/ISToolTip"
 
-local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small);
+RadioFrequencyManagerUI = ISCollapsableWindow:derive("RadioFrequencyManagerUI")
+
+--************************************************************************--
+--** RadioFrequencyManagerUI - helpers
+--************************************************************************--
 local mysplit = function(inputstr, sep)
     if sep == nil then
         sep = "%s"
@@ -19,6 +23,9 @@ local mysplit = function(inputstr, sep)
     return t
 end
 
+--************************************************************************--
+--** RadioFrequencyManagerUI - toggle handler
+--************************************************************************--
 KaldoRFM_UI = {};
 KaldoRFM_UI.instance = nil;
 KaldoRFM_UI.toggle = function()
@@ -32,51 +39,12 @@ KaldoRFM_UI.toggle = function()
     end
 end
 
-RadioFrequencyManagerUI = ISCollapsableWindow:derive("RadioFrequencyManagerUI")
-
 --************************************************************************--
---** RadioFrequencyManagerUI:new
---**
+--** RadioFrequencyManagerUI - base
 --************************************************************************--
-function RadioFrequencyManagerUI:new()
-    local mD = self:loadModData();
-
-    local panelWidth = mD.panelSettings.width;
-    local panelHeight = mD.panelSettings.height;
-    local startingX = mD.panelSettings.x;
-    local startingY = mD.panelSettings.y;
-
-    local o = {}
-    o = ISCollapsableWindow:new(startingX, startingY, panelWidth, panelHeight);
-    setmetatable(o, self);
-    self.__index = self;
-    o.title = getText("UI_KRFM_RfmTitle");
-    o.x = startingX;
-    o.y = startingY;
-    o.width = panelWidth;
-    o.height = panelHeight;
-    o.minimumWidth = 300;
-    o.minimumHeight = 100;
-    o.resizable = true;
-    o.drawFrame = true;
-    o.borderColor = {r=0.4, g=0.4, b=0.4, a=1};
-    o.backgroundColor.a = 0.9;
-    o.moveWithMouse = true;
-
-    o.storedChannels = mD.storedChannels;
-    o.renderedChannels = {};
-
-    o:initialise();
-    o:addToUIManager();
-
-    o:setInfo(getText("UI_KRFM_InfoText"));
-
-    return o;
-end
-
 function RadioFrequencyManagerUI:initialise()
     ISCollapsableWindow.initialise(self);
-    self:create();
+    -- self:create();
 end
 
 function RadioFrequencyManagerUI:prerender()
@@ -87,7 +55,10 @@ function RadioFrequencyManagerUI:render()
     ISCollapsableWindow.render(self);
 end
 
-function RadioFrequencyManagerUI:create()
+--************************************************************************--
+--** RadioFrequencyManagerUI - creating
+--************************************************************************--
+function RadioFrequencyManagerUI:createChildren()
     -- "Toolbar" buttons - Import/Export
     self.copyButton = ISButton:new(15, 25, 25, 25, getText("UI_KRFM_CopyFromRadio"), self, self.onCopy);
     self.copyButton.tooltip = getText("UI_KRFM_CopyFromRadio_Tooltip");
@@ -122,8 +93,6 @@ function RadioFrequencyManagerUI:renderStoredChannels()
     self.renderedChannels = {};
 
     table.sort(self.storedChannels, function(a, b) return a.Freq < b.Freq end);
-
-    -- TODO: render channels in a scrollable element
 
     -- insert stored channels
     local idx = 0;
@@ -192,6 +161,9 @@ function RadioFrequencyManagerUI.createChannelRow(parent, channel, index)
     return r;
 end
 
+--************************************************************************--
+--** RadioFrequencyManagerUI - actions and radio data processing
+--************************************************************************--
 function RadioFrequencyManagerUI:close()
     -- Redirect titlebar close, that way we can handle the instance ourselves
     KaldoRFM_UI.toggle();
@@ -399,6 +371,9 @@ function RadioFrequencyManagerUI:getRadioChannelElement()
     return channelElement;
 end
 
+--************************************************************************--
+--** RadioFrequencyManagerUI - mod data
+--************************************************************************--
 function RadioFrequencyManagerUI:loadModData()
     local player = getPlayer();
     if player then
@@ -438,7 +413,7 @@ end
 
 
 --************************************************************************--
---** Sandbox options - predefined channels
+--** RadioFrequencyManagerUI - Sandbox options
 --************************************************************************--
 Events.OnCreatePlayer.Add(function()
     if SandboxVars.RadioFrequencyManager.EnablePredefinedChannels == true then
@@ -476,3 +451,43 @@ Events.OnCreatePlayer.Add(function()
         KaldoRFM_UI.toggle();
     end
 end)
+
+--************************************************************************--
+--** RadioFrequencyManagerUI:new
+--**
+--************************************************************************--
+function RadioFrequencyManagerUI:new()
+    local mD = self:loadModData();
+
+    local panelWidth = mD.panelSettings.width;
+    local panelHeight = mD.panelSettings.height;
+    local startingX = mD.panelSettings.x;
+    local startingY = mD.panelSettings.y;
+
+    local o = {}
+    o = ISCollapsableWindow:new(startingX, startingY, panelWidth, panelHeight);
+    setmetatable(o, self);
+    self.__index = self;
+    o.title = getText("UI_KRFM_RfmTitle");
+    o.x = startingX;
+    o.y = startingY;
+    o.width = panelWidth;
+    o.height = panelHeight;
+    o.minimumWidth = 300;
+    o.minimumHeight = 100;
+    o.resizable = true;
+    o.drawFrame = true;
+    o.borderColor = {r=0.4, g=0.4, b=0.4, a=1};
+    o.backgroundColor.a = 0.9;
+    o.moveWithMouse = true;
+
+    o.storedChannels = mD.storedChannels;
+    o.renderedChannels = {};
+
+    o:initialise();
+    o:addToUIManager();
+
+    o:setInfo(getText("UI_KRFM_InfoText"));
+
+    return o;
+end
