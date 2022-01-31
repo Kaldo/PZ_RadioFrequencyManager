@@ -397,3 +397,45 @@ end
 --     self.height = self:getHeight();
 --     self:renderStoredChannels();
 -- end
+
+
+--************************************************************************--
+--** Predefined channels
+--************************************************************************--
+
+Events.OnCreatePlayer.Add(function()
+    if SandboxVars.RadioFrequencyManager.EnablePredefinedChannels == true then
+        -- create instance
+        KaldoRFM_UI.toggle();
+
+        local predefinedString = SandboxVars.RadioFrequencyManager.PredefinedChannels;
+        local predefinedColor = SandboxVars.RadioFrequencyManager.DefaultColor;
+
+        print("RFM_UI: OnCreatePlayer - initializing with sandbox option: " .. predefinedString);
+        
+        -- rudimentary validations in case the trust system fails
+        -- example: 89.4;Hitz FM|93.2;LBMW - Kentucky Radio|98;NNR Radio|101.2;KnoxTalk Radio
+        if predefinedString == nil then return end
+        if predefinedString:find(";", 1, true) == nil then return end
+        local spl = mysplit(predefinedString, "|");
+        if #spl < 1 then return end
+        for _, cs in ipairs(spl) do
+            -- a thousand curses to lua for not having continue
+            if cs ~= nil then
+                if cs:find(";", 1, true) ~= nil then
+                    local cspl = mysplit(cs, ";");
+                    local freq = tonumber(cspl[1]);
+                    if freq ~= nil then
+                        freq = freq * 1000
+                        local name = cspl[2]
+                        local newID = KaldoRFM_UI.instance:getNewChannelId();
+                        table.insert(KaldoRFM_UI.instance.storedChannels, { MyID = newID, Freq = freq, Name = name, State = predefinedColor });
+                    end
+                end
+            end
+        end
+
+        KaldoRFM_UI.instance:saveModData();
+        KaldoRFM_UI.toggle();
+    end
+end)
